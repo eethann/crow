@@ -124,7 +124,9 @@ do return { module_name  = 'i2c2midi'
     , args = { { 'chord', u8 }
              , { 'rev_binary', u16 }
   -- FIXME this currently breaks compilation, how to best implement ru16?
-            --  , { 'rev_binary', ru16 }
+  -- May be able ot adapt the pickle fn used in the disting ii file to handle
+  -- this case.
+          --  , { 'rev_binary', ru16 }
              }
     }
   , { name = 'chord_clear'
@@ -223,7 +225,111 @@ do return { module_name  = 'i2c2midi'
              , { 'direction', u8 }
              }
     }
+
+  -- MIDI IN 
+  , { name = 'midi_in_latch'
+    , cmd  = 100
+    , docs = 'Set MIDI IN latch setting'
+    , args = { { 'value', u8 } -- 1 (default) := latched, 0 := held notes only stored
+             }
+    }
+
+  -- MIDI CC
+  , { name = 'midi_cc'
+    , cmd  = 40
+    , docs = 'Send MIDI CC value'
+    , args = { { 'channel', u8 }
+             , { 'cc', u8 }
+             , { 'value', u8 }
+             }
+    }
+  , { name = 'midi_slew'
+    , cmd  = 44
+    , docs = 'Set MIDI CC slew'
+    , args = { { 'channel', u8 }
+             , { 'cc', u8 }
+             , { 'slew_ms', u16 }
+             }
+    }
+
   }
+
+, getters     = 
+  {
+  -- MIDI IN NOTE NUMBER
+    { name = 'midi_in_note'
+    , cmd  = 110
+    , docs = 'Get MIDI note number'
+    , args = { { 'chanel', u8 },
+               { 'index', u8} -- index into note history buffer
+             }
+    , retval = { 'note', s8 }
+    }
+    
+  -- MIDI IN NOTE VELOCITY
+    , { name = 'midi_in_vel'
+    , cmd  = 111
+    , docs = 'Get MIDI note velocity'
+    , args = { { 'chanel', u8 },
+               { 'index', u8} -- index into note history buffer
+             }
+    , retval = { 'velocity', s8 }
+    }
+    
+  -- MIDI IN CC
+    , { name = 'midi_in_cc'
+    , cmd  = 120
+    , docs = 'Get MIDI CC value'
+    , args = { { 'chanel', u8 },
+               { 'cc', u8}
+             }
+    , retval = { 'value', s8 }
+    }
+    
+  -- MIDI IN LATEST CHANEL
+    , { name = 'midi_in_latest_chan'
+    , cmd  = 130
+    , docs = 'Get latest MIDI event channel'
+    , retval = { 'channel', s8 }
+    }
+
+  -- MIDI IN LATEST NOTE
+    , { name = 'midi_in_latest_note'
+    , cmd  = 131
+    , docs = 'Get latest MIDI event note'
+    , retval = { 'note', s8 }
+    }
+  
+  -- MIDI IN LATEST VELOCITY
+    , { name = 'midi_in_latest_velocity'
+    , cmd  = 132
+    , docs = 'Get latest MIDI event velocity'
+    , retval = { 'velocity', s8 }
+    }
+  
+  -- MIDI IN LATEST NOTE OFF
+    , { name = 'midi_in_latest_note_off'
+    , cmd  = 133
+    , docs = 'Get latest MIDI note off'
+    , retval = { 'note', s8 }
+    }
+  
+  -- MIDI IN LATEST CC NUMBER
+    , { name = 'midi_in_latest_cc_num'
+    , cmd  = 134
+    , docs = 'Get latest MIDI CC number'
+    , retval = { 'controler', s8 }
+    }
+  
+  -- MIDI IN LATEST CC VALUE
+    , { name = 'midi_in_latest_cc_value'
+    , cmd  = 135
+    , docs = 'Get latest MIDI CC value'
+    , retval = { 'value', s8 }
+    }
+
+  }
+
 }
 
 end
